@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <title>Dashboard</title>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header_title d-flex justify-content-between">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <p>{{message}}</p>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %} 
+                <h1>Welcome {{user_name[0]['first_name']}} {{user_name[0]['last_name']}}!</h1>
+                <a href="/success">Dashboard</a>
+                <a href="/logout"><button class="btn btn-outline-info">Logout</button></a>
+            </div>
+            <div class="post_thought d-flex">
+                <form action="/add_thought" method="POST">
+                    <textarea name="thought" id="" cols="100" rows="1"></textarea>
+                    <input type="submit" value="Add Thought">
+                </form>
+            </div>
+        </div>
+        <div class="body">
+            {% for thought in thoughts %}
+            <div class="d-flex">
+                <h4><a href="/user_page/{{thought['id']}}">{{ thought['first_name'] }}</a> says:</h4>
+            </div>
+            <div class="d-flex">
+                <p class="border border-2 p-1 col-sm-6">{{ thought['content'] }}</p>
+                    {% if thought['id'] == session['userid'] %}
+                    <form action="/delete_post/{{thought['id']}}" method="POST">
+                        <input type="hidden" name="delete_post" value="{{ thought['thoughts.id'] }}">
+                        <input type="submit" value="Delete">
+                    </form>
+                    {% endif %}
+            </div>
+                <div class="d-flex">
+                    <form action="/like" method="POST">
+                        <input type="hidden" name="thought_id" value="{{ thought['thoughts.id'] }}">
+                        <input type="submit" value="Like">
+                    </form>
+                    <form action="/unlike" method="POST">
+                        <input type="hidden" name="thought_unlike" value="{{ thought['thoughts.id'] }}">
+                        <input type="submit" value="Unlike">
+                    </form>
+                </div>
+                {% for like in likes %}
+                    {% if like['thought_id'] == thought['thoughts.id'] %}
+                        <p>{{ like['num_likes'] }} people like this</p>
+                    {% endif %}
+                {% endfor %}
+                
+            {% endfor %}
+            
+        </div>
+    </div>
+</body>
+</html>
